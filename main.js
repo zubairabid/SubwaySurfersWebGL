@@ -17,6 +17,7 @@ function main() {
 
   c = new cube(gl, [2, 5.0, -3.0]);
   c1 = new cube(gl, [1.5, 0.0, -6.0]);
+  c2 = new cube(gl, [-1.0, 1.0, -5.0]);
   // If we don't have a GL context, give up now
 
   if (!gl) {
@@ -126,28 +127,29 @@ function drawScene(gl, programInfo, deltaTime) {
 
   // Set the drawing position to the "identity" point, which is
   // the center of the scene.
-    var cameraMatrix = mat4.create();
-    mat4.translate(cameraMatrix, cameraMatrix, [2, 5, 0]);
-    var cameraPosition = [
-      cameraMatrix[12],
-      cameraMatrix[13],
-      cameraMatrix[14],
-    ];
+  var cameraMatrix = mat4.create();
+  // mat4.translate(cameraMatrix, cameraMatrix, [2, 5, 0]);
+  var cameraPosition = [
+    cameraMatrix[12],
+    cameraMatrix[13],
+    cameraMatrix[14],
+  ];
 
-    var up = [0, 1, 0];
+  var up = [0, 1, 0];
 
-    mat4.lookAt(cameraMatrix, cameraPosition, c.pos, up);
+  mat4.lookAt(cameraMatrix, cameraPosition, c.pos, up);
 
-    var viewMatrix = cameraMatrix;//mat4.create();
+  var viewMatrix = cameraMatrix;//mat4.create();
 
-    //mat4.invert(viewMatrix, cameraMatrix);
+  //mat4.invert(viewMatrix, cameraMatrix);
 
-    var viewProjectionMatrix = mat4.create();
+  var viewProjectionMatrix = mat4.create();
 
-    mat4.multiply(viewProjectionMatrix, projectionMatrix, viewMatrix);
+  mat4.multiply(viewProjectionMatrix, projectionMatrix, viewMatrix);
 
   c.drawCube(gl, viewProjectionMatrix, programInfo, deltaTime);
-  //c1.drawCube(gl, projectionMatrix, programInfo, deltaTime);
+  c1.drawCube(gl, projectionMatrix, programInfo, deltaTime);
+  c2.drawCube(gl, projectionMatrix, programInfo, deltaTime);
 
 }
 
