@@ -9,17 +9,24 @@ main();
 var c;
 var c1;
 
+
 function main() {
 
 
-  const canvas = document.querySelector('#glcanvas');
-  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+  canvas = document.querySelector('#glcanvas');
+  gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
 
-  c = new cube(gl, [2, 5.0, -3.0]);
-  c1 = new cube(gl, [1.5, 0.0, -6.0]);
-  c2 = new cube(gl, [-1.0, 1.0, -5.0]);
   
-  tc = new textcube(gl, [1.0, 1.0, -5.0]);
+  speed_z = 0.02;
+  dist = 0;
+  renderlen = 20;
+  tracktrk = 0;
+  trackside = 0;
+
+  trk = [];
+  side = [];
+  init();
+
   // If we don't have a GL context, give up now
 
   if (!gl) {
@@ -125,12 +132,43 @@ function main() {
     const deltaTime = now - then;
     then = now;
 
+    dist += speed_z;
+    console.log(dist);
+    if (dist >= 2) {
+      // Create floor
+      // btrk = new track(gl, [0.0, -1.0, dist], speed_z);
+      trackside += 1;
+      if (trackside >= renderlen) {
+        trackside = 0;
+      }
+      tracktrk += 1;
+      if (tracktrk >= renderlen) {
+        tracktrk = 0;
+      }
+  
+      trk[tracktrk] = new track(gl, [0.0, -1.7, -38.0], speed_z);
+      side[trackside] = new sidewall(gl, [-3.0, 0.3, -38.0], speed_z);
+      
+      dist = 0;
+    }
+
+
     drawScene(gl, programInfoText, deltaTime);
 
     requestAnimationFrame(render);
   }
   requestAnimationFrame(render);
 }
+
+
+
+function init() {
+  for (let i = 0; i < renderlen; i++) {
+    trk[i] = new track(gl, [0.0, -1.7, -2*i], speed_z);
+    side[i] = new sidewall(gl, [-3.0, 0.3, -2*i], speed_z);
+  }
+}
+
 
 //
 // Draw the scene.
@@ -178,7 +216,7 @@ function drawScene(gl, programInfo, deltaTime) {
 
   var up = [0, 1, 0];
 
-  mat4.lookAt(cameraMatrix, cameraPosition, c.pos, up);
+  mat4.lookAt(cameraMatrix, cameraPosition, [0, 0, 0], up);
 
   var viewMatrix = cameraMatrix;//mat4.create();
 
@@ -192,7 +230,14 @@ function drawScene(gl, programInfo, deltaTime) {
   // c1.drawCube(gl, projectionMatrix, programInfo, deltaTime);
   // c2.drawCube(gl, projectionMatrix, programInfo, deltaTime);
 
-  tc.drawCube(gl, projectionMatrix, programInfo, deltaTime);
+  // tc.drawCube(gl, projectionMatrix, programInfo, deltaTime);
+  // btrk.drawCube(gl, projectionMatrix, programInfo, deltaTime);
+  // side.drawCube(gl, projectionMatrix, programInfo, deltaTime);
+
+  for (let i = 0; i < renderlen; i++) {
+    trk[i].drawCube(gl, projectionMatrix, programInfo, deltaTime);
+    side[i].drawCube(gl, projectionMatrix, programInfo, deltaTime);
+  }
 
 }
 
