@@ -1,6 +1,6 @@
 /// <reference path="webgl.d.ts" />
 
-let cube = class {
+let textcube = class {
     constructor(gl, pos) {
         this.positionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
@@ -43,34 +43,82 @@ let cube = class {
         this.pos = pos;
 
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.positions), gl.STATIC_DRAW);
-        
-        this.faceColors = [
-            [ Math.random(),  Math.random(),  Math.random(),  Math.random()],    // Left face: purple
-            [ Math.random(), Math.random(), Math.random(), Math.random()], // Left face: purple
-            [ Math.random(), Math.random(), Math.random(), Math.random()], // Left face: purple
-            [ Math.random(), Math.random(), Math.random(), Math.random()], // Left face: purple
-            [ Math.random(), Math.random(), Math.random(), Math.random()], // Left face: purple
-            [ Math.random(), Math.random(), Math.random(), Math.random()], // Left face: purple
 
+        
+
+        // The code for textures is similar to colours, but replacing
+        this.texture = loadTexture(gl, 'cubetexture.png');
+        console.log("Got texture loaded:", this.texture);
+
+        const textureCoordinates = [
+            // Front
+            0.0,  0.0,
+            1.0,  0.0,
+            1.0,  1.0,
+            0.0,  1.0,
+            // Back
+            0.0,  0.0,
+            1.0,  0.0,
+            1.0,  1.0,
+            0.0,  1.0,
+            // Top
+            0.0,  0.0,
+            1.0,  0.0,
+            1.0,  1.0,
+            0.0,  1.0,
+            // Bottom
+            0.0,  0.0,
+            1.0,  0.0,
+            1.0,  1.0,
+            0.0,  1.0,
+            // Right
+            0.0,  0.0,
+            1.0,  0.0,
+            1.0,  1.0,
+            0.0,  1.0,
+            // Left
+            0.0,  0.0,
+            1.0,  0.0,
+            1.0,  1.0,
+            0.0,  1.0,
         ];
 
-        var colors = [];
+
+        const textureCoordBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates),
+                        gl.STATIC_DRAW);
+
+        // this.faceColors = [
+        //     [ Math.random(),  Math.random(),  Math.random(),  Math.random()],    // Left face: purple
+        //     [ Math.random(), Math.random(), Math.random(), Math.random()], // Left face: purple
+        //     [ Math.random(), Math.random(), Math.random(), Math.random()], // Left face: purple
+        //     [ Math.random(), Math.random(), Math.random(), Math.random()], // Left face: purple
+        //     [ Math.random(), Math.random(), Math.random(), Math.random()], // Left face: purple
+        //     [ Math.random(), Math.random(), Math.random(), Math.random()], // Left face: purple
+
+        // ];
+
+        // var colors = [];
 
 
 
-        for (var j = 0; j < this.faceColors.length; ++j) {
-            const c = this.faceColors[j];
+        // for (var j = 0; j < this.faceColors.length; ++j) {
+        //     const c = this.faceColors[j];
 
-            // Repeat each color four times for the four vertices of the face
-            colors = colors.concat(c, c, c, c);
-        }
+        //     // Repeat each color four times for the four vertices of the face
+        //     colors = colors.concat(c, c, c, c);
+        // }
 
-        const colorBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+        // REPLACES
+        // const colorBuffer = gl.createBuffer();
+        // gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+        // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
 
         // Build the element array buffer; this specifies the indices
         // into the vertex arrays for each face's vertices.
+
+
 
         const indexBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
@@ -95,7 +143,7 @@ let cube = class {
 
         this.buffer = {
             position: this.positionBuffer,
-            color: colorBuffer,
+            textureCoord: textureCoordBuffer,
             indices: indexBuffer,
         }
 
@@ -134,25 +182,42 @@ let cube = class {
                 programInfo.attribLocations.vertexPosition);
         }
 
+        // tell webgl how to pull out the texture coordinates from buffer
+        {
+            const num = 2; // every coordinate composed of 2 values
+            const type = gl.FLOAT; // the data in the buffer is 32 bit float
+            const normalize = false; // don't normalize
+            const stride = 0; // how many bytes to get from one set to the next
+            const offset = 0; // how many bytes inside the buffer to start from
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer.textureCoord);
+            gl.vertexAttribPointer(programInfo.attribLocations.textureCoord, 
+                                    num, 
+                                    type, 
+                                    normalize, 
+                                    stride, 
+                                    offset);
+            gl.enableVertexAttribArray(programInfo.attribLocations.textureCoord);
+        }
+
         // Tell WebGL how to pull out the colors from the color buffer
         // into the vertexColor attribute.
-        {
-            const numComponents = 4;
-            const type = gl.FLOAT;
-            const normalize = false;
-            const stride = 0;
-            const offset = 0;
-            gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer.color);
-            gl.vertexAttribPointer(
-                programInfo.attribLocations.vertexColor,
-                numComponents,
-                type,
-                normalize,
-                stride,
-                offset);
-            gl.enableVertexAttribArray(
-                programInfo.attribLocations.vertexColor);
-        }
+        // {
+        //     const numComponents = 4;
+        //     const type = gl.FLOAT;
+        //     const normalize = false;
+        //     const stride = 0;
+        //     const offset = 0;
+        //     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer.color);
+        //     gl.vertexAttribPointer(
+        //         programInfo.attribLocations.vertexColor,
+        //         numComponents,
+        //         type,
+        //         normalize,
+        //         stride,
+        //         offset);
+        //     gl.enableVertexAttribArray(
+        //         programInfo.attribLocations.vertexColor);
+        // }
 
         // Tell WebGL which indices to use to index the vertices
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffer.indices);
@@ -171,6 +236,17 @@ let cube = class {
             programInfo.uniformLocations.modelViewMatrix,
             false,
             modelViewMatrix);
+
+        
+        // Tell WebGL we want to affect texture unit 0
+        gl.activeTexture(gl.TEXTURE0);
+
+        // Bind the texture to texture unit 0
+        gl.bindTexture(gl.TEXTURE_2D, this.texture);
+
+        // Tell the shader we bound the texture to texture unit 0
+        gl.uniform1i(programInfo.uniformLocations.uSampler, 0);
+
 
         {
             const vertexCount = 36;

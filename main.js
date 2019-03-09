@@ -18,6 +18,8 @@ function main() {
   c = new cube(gl, [2, 5.0, -3.0]);
   c1 = new cube(gl, [1.5, 0.0, -6.0]);
   c2 = new cube(gl, [-1.0, 1.0, -5.0]);
+  
+  tc = new textcube(gl, [1.0, 1.0, -5.0]);
   // If we don't have a GL context, give up now
 
   if (!gl) {
@@ -42,6 +44,21 @@ function main() {
     }
   `;
 
+  const vsSourceText = `
+    attribute vec4 aVertexPosition;
+    attribute vec2 aTextureCoord;
+
+    uniform mat4 uModelViewMatrix;
+    uniform mat4 uProjectionMatrix;
+
+    varying highp vec2 vTextureCoord;
+
+    void main(void) {
+      gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+      vTextureCoord = aTextureCoord;
+    }
+  `;
+
   // Fragment shader program
 
   const fsSource = `
@@ -52,9 +69,20 @@ function main() {
     }
   `;
 
+  const fsSourceText = `
+    varying highp vec2 vTextureCoord;
+
+    uniform sampler2D uSampler;
+
+    void main(void) {
+      gl_FragColor = texture2D(uSampler, vTextureCoord);
+    }
+  `;
+
   // Initialize a shader program; this is where all the lighting
   // for the vertices and so forth is established.
   const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
+  const shaderProgramText = initShaderProgram(gl, vsSourceText, fsSourceText);
 
   // Collect all the info needed to use the shader program.
   // Look up which attributes our shader program is using
@@ -72,6 +100,19 @@ function main() {
     },
   };
 
+  const programInfoText = {
+    program: shaderProgramText,
+    attribLocations: {
+      vertexPosition: gl.getAttribLocation(shaderProgramText, 'aVertexPosition'),
+      textureCoord: gl.getAttribLocation(shaderProgramText, 'aTextureCoord'),
+    },
+    uniformLocations: {
+      projectionMatrix: gl.getUniformLocation(shaderProgramText, 'uProjectionMatrix'),
+      modelViewMatrix: gl.getUniformLocation(shaderProgramText, 'uModelViewMatrix'),
+      uSampler: gl.getUniformLocation(shaderProgramText, 'uSampler'),
+    },
+  };
+
   // Here's where we call the routine that builds all the
   // objects we'll be drawing.
   //const buffers
@@ -84,7 +125,7 @@ function main() {
     const deltaTime = now - then;
     then = now;
 
-    drawScene(gl, programInfo, deltaTime);
+    drawScene(gl, programInfoText, deltaTime);
 
     requestAnimationFrame(render);
   }
@@ -147,9 +188,11 @@ function drawScene(gl, programInfo, deltaTime) {
 
   mat4.multiply(viewProjectionMatrix, projectionMatrix, viewMatrix);
 
-  c.drawCube(gl, viewProjectionMatrix, programInfo, deltaTime);
-  c1.drawCube(gl, projectionMatrix, programInfo, deltaTime);
-  c2.drawCube(gl, projectionMatrix, programInfo, deltaTime);
+  // c.drawCube(gl, viewProjectionMatrix, programInfo, deltaTime);
+  // c1.drawCube(gl, projectionMatrix, programInfo, deltaTime);
+  // c2.drawCube(gl, projectionMatrix, programInfo, deltaTime);
+
+  tc.drawCube(gl, projectionMatrix, programInfo, deltaTime);
 
 }
 
