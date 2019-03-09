@@ -11,20 +11,41 @@ var c1;
 
 
 function main() {
-
+  
+  boffset = -1.0;
 
   canvas = document.querySelector('#glcanvas');
   gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
 
   
-  speed_z = 0.02;
+  speed_z = 0.08;
   dist = 0;
-  renderlen = 20;
+  renderlen = 40;
   tracktrk = 0;
   trackside = 0;
+  trackstattrain = 0;
+  tracktrain = 0;
+  trackfence = 0;
+  trackcoins = 0;
+  coinlen = 100;
+  coinprob = 0.06;
+  obslen = 20;
+  obsprob = 0.004;
+
+  strn_fin = false;
+  trn_fin = false;
+  fence_fin = false;
+  coin_fin = false;
 
   trk = [];
   side = [];
+  coins = []
+  
+  stattrain = [];
+  strain = [];
+  fence = [];
+  
+
   init();
 
   // If we don't have a GL context, give up now
@@ -146,11 +167,95 @@ function main() {
         tracktrk = 0;
       }
   
-      trk[tracktrk] = new track(gl, [0.0, -1.7, -38.0], speed_z);
-      side[trackside] = new sidewall(gl, [-3.0, 0.3, -38.0], speed_z);
+      trk[tracktrk] = new track(gl, [0.0, -1.7+boffset, -(renderlen-1)*2], speed_z);
+      side[trackside] = new sidewall(gl, [-3.0, 0.3+boffset, -(renderlen-1)*2], speed_z);
       
       dist = 0;
     }
+
+
+    // Create stationary trains
+    if (Math.random() < obsprob) {
+
+      // Stationary train
+      pos = 0.0;
+      if (Math.random() < 0.33) {
+        pos = 1.7;
+      }
+      else if (Math.random() < 0.66) {
+        pos = -1.7;
+      }
+
+      stattrain[trackstattrain] = new trainstat(gl, [pos, -1.7, -(renderlen-1)*2], speed_z);
+      trackstattrain += 1;
+      if (trackstattrain >= obslen) {
+        trackstattrain = 0;
+        strn_fin = true;
+      }
+    }
+
+    // Create moving trains
+    if (Math.random() < obsprob) {
+
+      // Moving train
+      pos = 0.0;
+      if (Math.random() < 0.33) {
+        pos = 1.7;
+      }
+      else if (Math.random() < 0.66) {
+        pos = -1.7;
+      }
+
+      strain[tracktrain] = new train(gl, [pos, -1.7, -(renderlen-1)*2], 4*speed_z);
+      tracktrain += 1;
+      if (tracktrain >= obslen) {
+        tracktrain = 0;
+        trn_fin = true;
+      }
+    }
+
+    // Create moving trains
+    if (Math.random() < obsprob) {
+
+      // Moving train
+      pos = 0.0;
+      if (Math.random() < 0.33) {
+        pos = 1.7;
+      }
+      else if (Math.random() < 0.66) {
+        pos = -1.7;
+      }
+
+
+      fence[trackfence] = new fences(gl, [pos, -2.2, -(renderlen-1)*2], speed_z);
+      trackfence += 1;
+      if (trackfence >= obslen) {
+        trackfence = 0;
+        fence_fin = true;
+      }
+    }
+    
+    // Create coins 
+    if (Math.random() < coinprob) {
+
+      // Moving train
+      pos = 0.0;
+      if (Math.random() < 0.33) {
+        pos = 1.7;
+      }
+      else if (Math.random() < 0.66) {
+        pos = -1.7;
+      }
+
+
+      coins[trackcoins] = new coin(gl, [pos, -2.5, -(renderlen-1)*2], speed_z);
+      trackcoins += 1;
+      if (trackcoins >= coinlen) {
+        trackcoins = 0;
+        coin_fin = true;
+      }
+    }
+    
 
 
     drawScene(gl, programInfoText, deltaTime);
@@ -163,11 +268,12 @@ function main() {
 
 
 function init() {
-  player = new player(gl, [0.0, -1.0, -6.0], 0)
+  player = new player(gl, [0.0, -1.0+boffset, -6.0], 0)
   for (let i = 0; i < renderlen; i++) {
-    trk[i] = new track(gl, [0.0, -1.7, -2*i], speed_z);
-    side[i] = new sidewall(gl, [-3.0, 0.3, -2*i], speed_z);
+    trk[i] = new track(gl, [0.0, -1.7+boffset, -2*i], speed_z);
+    side[i] = new sidewall(gl, [-3.0, 0.3+boffset, -2*i], speed_z);
   }
+  stattrain = new trainstat(gl, [0.0, -0.7+boffset, -20.0], speed_z);
 }
 
 
@@ -175,7 +281,7 @@ function init() {
 // Draw the scene.
 //
 function drawScene(gl, programInfo, deltaTime) {
-  gl.clearColor(0.0, 0.0, 0.0, 1.0);  // Clear to black, fully opaque
+  gl.clearColor(113.0/256.0, 159.0/256.0, 232.0/256.0, 1.0);  // Clear to black, fully opaque
   gl.clearDepth(1.0);                 // Clear everything
   gl.enable(gl.DEPTH_TEST);           // Enable depth testing
   gl.depthFunc(gl.LEQUAL);            // Near things obscure far things
@@ -209,10 +315,10 @@ function drawScene(gl, programInfo, deltaTime) {
   // the center of the scene.
   var cameraMatrix = mat4.create();
   // mat4.translate(cameraMatrix, cameraMatrix, [2, 5, 0]);
-  var cameraPosition = [
-    cameraMatrix[12],
-    cameraMatrix[13],
-    cameraMatrix[14],
+  var cameraPosition = [ 0.0, 4.0, 0.0,
+    // cameraMatrix[12],
+    // cameraMatrix[13],
+    // cameraMatrix[14],
   ];
 
   var up = [0, 1, 0];
@@ -240,6 +346,55 @@ function drawScene(gl, programInfo, deltaTime) {
     trk[i].drawCube(gl, projectionMatrix, programInfo, deltaTime);
     side[i].drawCube(gl, projectionMatrix, programInfo, deltaTime);
   }
+  stattrain.drawCube(gl, projectionMatrix, programInfo, deltaTime);
+
+  if (!strn_fin) {
+    for (let i = 0; i < trackstattrain; i++) {
+      stattrain[i].drawCube(gl, projectionMatrix, programInfo, deltaTime);
+    }
+  }
+  else {
+    for (let i = 0; i < obslen; i++) {
+      stattrain[i].drawCube(gl, projectionMatrix, programInfo, deltaTime);
+    }
+  }
+
+  if (!trn_fin) {
+    for (let i = 0; i < tracktrain; i++) {
+      strain[i].drawCube(gl, projectionMatrix, programInfo, deltaTime);
+    }
+  }
+  else {
+    for (let i = 0; i < obslen; i++) {
+      strain[i].drawCube(gl, projectionMatrix, programInfo, deltaTime);
+    }
+  }
+
+  if (!fence_fin) {
+    for (let i = 0; i < trackfence; i++) {
+      fence[i].drawCube(gl, projectionMatrix, programInfo, deltaTime);
+    }
+  }
+  else {
+    for (let i = 0; i < obslen; i++) {
+      fence[i].drawCube(gl, projectionMatrix, programInfo, deltaTime);
+    }
+  }
+
+  if (!coin_fin) {
+    for (let i = 0; i < trackcoins; i++) {
+      coins[i].drawCube(gl, projectionMatrix, programInfo, deltaTime);
+    }
+  }
+  else {
+    for (let i = 0; i < obslen; i++) {
+      coins[i].drawCube(gl, projectionMatrix, programInfo, deltaTime);
+    }
+  }
+
+  
+
+  
 
 }
 
@@ -311,7 +466,7 @@ document.addEventListener('keyup', function (event) {
   }
   if (key === 'ArrowUp' || key === 38) {
       console.log("up was hit");
-      if (player.pos[1] == -1.0) {
+      if (player.pos[1] == -2.0) {
         player.speed_y = 0.2;
       }
   }

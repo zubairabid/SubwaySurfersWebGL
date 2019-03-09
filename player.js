@@ -173,10 +173,11 @@ let player = class {
 
         if (this.speed_y != 0) {
             this.pos[1] += this.speed_y;
+            console.log("In loop: ", this.pos[1]);
             this.speed_y -= 0.01;
-            if (this.pos[1] <= -1.0) {
+            if (this.pos[1] <= -2.0) {
                 this.speed_y = 0;
-                this.pos[1] = -1.0;
+                this.pos[1] = -2.0;
             }
         }
 
