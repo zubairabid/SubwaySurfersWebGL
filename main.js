@@ -133,7 +133,7 @@ function main() {
     then = now;
 
     dist += speed_z;
-    console.log(dist);
+    // console.log(dist);
     if (dist >= 2) {
       // Create floor
       // btrk = new track(gl, [0.0, -1.0, dist], speed_z);
@@ -163,6 +163,7 @@ function main() {
 
 
 function init() {
+  player = new player(gl, [0.0, -1.0, -6.0], 0)
   for (let i = 0; i < renderlen; i++) {
     trk[i] = new track(gl, [0.0, -1.7, -2*i], speed_z);
     side[i] = new sidewall(gl, [-3.0, 0.3, -2*i], speed_z);
@@ -234,6 +235,7 @@ function drawScene(gl, programInfo, deltaTime) {
   // btrk.drawCube(gl, projectionMatrix, programInfo, deltaTime);
   // side.drawCube(gl, projectionMatrix, programInfo, deltaTime);
 
+  player.drawCube(gl, projectionMatrix, programInfo, deltaTime);
   for (let i = 0; i < renderlen; i++) {
     trk[i].drawCube(gl, projectionMatrix, programInfo, deltaTime);
     side[i].drawCube(gl, projectionMatrix, programInfo, deltaTime);
@@ -290,3 +292,28 @@ function loadShader(gl, type, source) {
 
   return shader;
 }
+document.addEventListener('keyup', function (event) {
+  if (event.defaultPrevented) {
+      return;
+  }
+
+  var key = event.key || event.keyCode;
+
+  if (key === 'ArrowRight' || key === 39) {
+      console.log("right was hit");
+      player.speed_x = 0.5;
+      // this.move();
+  }
+  if (key === 'ArrowLeft' || key === 37) {
+      console.log("left was hit");
+      player.speed_x = -0.5;
+      // this.move();
+  }
+  if (key === 'ArrowUp' || key === 38) {
+      console.log("up was hit");
+      if (player.pos[1] == -1.0) {
+        player.speed_y = 0.2;
+      }
+  }
+
+});
