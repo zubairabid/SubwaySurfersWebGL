@@ -268,7 +268,7 @@ function main() {
 
 
 function init() {
-  player = new player(gl, [0.0, -1.0+boffset, -6.0], 0)
+  player = new player(gl, [0.0, -1.0+boffset, -8.0], 0)
   for (let i = 0; i < renderlen; i++) {
     trk[i] = new track(gl, [0.0, -1.7+boffset, -2*i], speed_z);
     side[i] = new sidewall(gl, [-3.0, 0.3+boffset, -2*i], speed_z);
