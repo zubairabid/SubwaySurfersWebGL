@@ -74,16 +74,30 @@ function main() {
 
   const vsSourceText = `
     attribute vec4 aVertexPosition;
+    attribute vec3 aVertexNormal;
     attribute vec2 aTextureCoord;
 
+    uniform mat4 uNormalMatrix;
     uniform mat4 uModelViewMatrix;
     uniform mat4 uProjectionMatrix;
 
     varying highp vec2 vTextureCoord;
+    varying highp vec3 vLighting;
 
     void main(void) {
       gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
       vTextureCoord = aTextureCoord;
+
+      // Apply lighting effect
+
+      highp vec3 ambientLight = vec3(0.3, 0.3, 0.3);
+      highp vec3 directionalLightColor = vec3(1, 1, 1);
+      highp vec3 directionalVector = normalize(vec3(0.85, -0.8, 0.75));
+
+      highp vec4 transformedNormal = uNormalMatrix * vec4(aVertexNormal, 1.0);
+
+      highp float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
+      vLighting = ambientLight + (directionalLightColor * directional);
     }
   `;
 
@@ -99,11 +113,14 @@ function main() {
 
   const fsSourceText = `
     varying highp vec2 vTextureCoord;
+    varying highp vec3 vLighting;
 
     uniform sampler2D uSampler;
 
     void main(void) {
-      gl_FragColor = texture2D(uSampler, vTextureCoord);
+      highp vec4 texelColor = texture2D(uSampler, vTextureCoord);
+
+      gl_FragColor = vec4(texelColor.rgb * vLighting, texelColor.a);
     }
   `;
 
@@ -128,15 +145,30 @@ function main() {
     },
   };
 
+  // const programInfoText = {
+  //   program: shaderProgramText,
+  //   attribLocations: {
+  //     vertexPosition: gl.getAttribLocation(shaderProgramText, 'aVertexPosition'),
+  //     textureCoord: gl.getAttribLocation(shaderProgramText, 'aTextureCoord'),
+  //   },
+  //   uniformLocations: {
+  //     projectionMatrix: gl.getUniformLocation(shaderProgramText, 'uProjectionMatrix'),
+  //     modelViewMatrix: gl.getUniformLocation(shaderProgramText, 'uModelViewMatrix'),
+  //     uSampler: gl.getUniformLocation(shaderProgramText, 'uSampler'),
+  //   },
+  // };
+
   const programInfoText = {
     program: shaderProgramText,
     attribLocations: {
       vertexPosition: gl.getAttribLocation(shaderProgramText, 'aVertexPosition'),
+      vertexNormal: gl.getAttribLocation(shaderProgramText, 'aVertexNormal'),
       textureCoord: gl.getAttribLocation(shaderProgramText, 'aTextureCoord'),
     },
     uniformLocations: {
       projectionMatrix: gl.getUniformLocation(shaderProgramText, 'uProjectionMatrix'),
       modelViewMatrix: gl.getUniformLocation(shaderProgramText, 'uModelViewMatrix'),
+      normalMatrix: gl.getUniformLocation(shaderProgramText, 'uNormalMatrix'),
       uSampler: gl.getUniformLocation(shaderProgramText, 'uSampler'),
     },
   };
@@ -248,7 +280,7 @@ function main() {
       }
 
 
-      coins[trackcoins] = new coin(gl, [pos, -2.5, -(renderlen-1)*2], speed_z);
+      coins[trackcoins] = new coin(gl, [pos, -2, -(renderlen-1)*2], speed_z);
       trackcoins += 1;
       if (trackcoins >= coinlen) {
         trackcoins = 0;
@@ -281,7 +313,7 @@ function init() {
 // Draw the scene.
 //
 function drawScene(gl, programInfo, deltaTime) {
-  gl.clearColor(113.0/256.0, 159.0/256.0, 232.0/256.0, 1.0);  // Clear to black, fully opaque
+  gl.clearColor(56.0/256.0, 80.0/256.0, 116.0/256.0, 1.0);  // Clear to black, fully opaque
   gl.clearDepth(1.0);                 // Clear everything
   gl.enable(gl.DEPTH_TEST);           // Enable depth testing
   gl.depthFunc(gl.LEQUAL);            // Near things obscure far things
