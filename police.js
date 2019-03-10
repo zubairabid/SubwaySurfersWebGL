@@ -1,45 +1,45 @@
 /// <reference path="webgl.d.ts" />
 
-let jetpack = class {
+let police = class {
     constructor(gl, pos, speed_z) {
         this.positionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
 
-        this.width = 0.4;
-        this.height = 0.4;
-        this.length = 0.1;
+        this.width = 1;
+        this.height = 0.2;
+        this.length = 0.2;
 
         this.positions = [
              // Front face
-            -0.4, -0.4, 0.1,
-            0.4, -0.4, 0.1,
-            0.4, 0.4, 0.1,
-            -0.4, 0.4, 0.1,
+            -this.width, -this.height, this.length,
+            this.width, -this.height, this.length,
+            this.width, this.height, this.length,
+            -this.width, this.height, this.length,
             //Back Face
-            -0.4, -0.4, -0.1,
-            0.4, -0.4, -0.1,
-            0.4, 0.4, -0.1,
-            -0.4, 0.4, -0.1,
+            -this.width, -this.height, -this.length,
+            this.width, -this.height, -this.length,
+            this.width, this.height, -this.length,
+            -this.width, this.height, -this.length,
             //Top Face
-            -0.4, 0.4, -0.1,
-            0.4, 0.4, -0.1,
-            0.4, 0.4, 0.1,
-            -0.4, 0.4, 0.1,
+            -this.width, this.height, -this.length,
+            this.width, this.height, -this.length,
+            this.width, this.height, this.length,
+            -this.width, this.height, this.length,
             //Bottom Face
-            -0.4, -0.4, -0.1,
-            0.4, -0.4, -0.1,
-            0.4, -0.4, 0.1,
-            -0.4, -0.4, 0.1,
+            -this.width, -this.height, -this.length,
+            this.width, -this.height, -this.length,
+            this.width, -this.height, this.length,
+            -this.width, -this.height, this.length,
             //Left Face
-            -0.4, -0.4, -0.1,
-            -0.4, 0.4, -0.1,
-            -0.4, 0.4, 0.1,
-            -0.4, -0.4, 0.1,
+            -this.width, -this.height, -this.length,
+            -this.width, this.height, -this.length,
+            -this.width, this.height, this.length,
+            -this.width, -this.height, this.length,
             //Right Face
-            0.4, -0.4, -0.1,
-            0.4, 0.4, -0.1,
-            0.4, 0.4, 0.1,
-            0.4, -0.4, 0.1,
+            this.width, -this.height, -this.length,
+            this.width, this.height, -this.length,
+            this.width, this.height, this.length,
+            this.width, -this.height, this.length,
         ];
 
         this.rotation = 0;
@@ -54,7 +54,7 @@ let jetpack = class {
         
 
         // The code for textures is similar to colours, but replacing
-        this.texture = loadTexture(gl, 'jet.png');
+        this.texture = loadTexture(gl, 'steve.jpeg');
         // console.log("Got texture loaded:", this.texture);
 
         const textureCoordinates = [
@@ -94,8 +94,7 @@ let jetpack = class {
         const textureCoordBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates),
-            gl.STATIC_DRAW);
-
+                        gl.STATIC_DRAW);
 
 
 
@@ -143,7 +142,7 @@ let jetpack = class {
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexNormals),
         gl.STATIC_DRAW);
 
-                
+
 
         const indexBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
@@ -173,12 +172,68 @@ let jetpack = class {
             indices: indexBuffer,
         }
 
+        
+        // document.addEventListener('keyup', function (event) {
+        //     if (event.defaultPrevented) {
+        //         return;
+        //     }
+        
+        //     var key = event.key || event.keyCode;
+        
+        //     if (key === 'ArrowRight' || key === 39) {
+        //         console.log("right was hit");
+        //         this.speed_x = 0.1;
+        //         // this.move();
+        //     }
+        //     if (key === 'ArrowLeft' || key === 37) {
+        //         console.log("left was hit");
+        //         this.speed_x = -0.1;
+        //         // this.move();
+        //     }
+        //     if (key === 'ArrowUp' || key === 38) {
+        //         console.log("up was hit");
+        //     }
+
+        // });
     }
 
     move() {
         // console.log(this.speed_x);
         this.pos[2] += this.speed_z;
-        this.pos[1] += this.speed_y;
+
+        if (this.speed_x != 0) {
+            // console.log("Should move");
+            this.pos[0] += this.speed_x;
+
+            if (this.pos[0] > 2.1 || this.pos[0] < -2.1) {
+                this.pos[0] -= this.speed_x;
+            }
+            // console.log(this.pos[0]);
+
+            if (this.pos[0] == 0 || this.pos[0] == -2.1 || this.pos[0] == 2.1) {
+                this.speed_x = 0;
+            }
+        }
+
+        // if (this.speed_y >= 0 && this.pos[1] != -1.0) {
+        //     this.pos[1] += this.speed_y;
+        //     this.speed_y += 0.1;
+        // }
+        // else if (this.speed_y < 0) {
+        //     this.pos[1] += this.speed_y;
+        //     this.speed_y += 0.1;
+        // }
+
+        if (this.speed_y != 0) {
+            this.pos[1] += this.speed_y;
+            // console.log("In loop: ", this.pos[1]);
+            this.speed_y -= 0.01;
+            if (this.pos[1] <= -2.0) {
+                this.speed_y = 0;
+                this.pos[1] = -2.0;
+            }
+        }
+
     }
 
     drawCube(gl, projectionMatrix, programInfo, deltaTime) {
@@ -190,7 +245,7 @@ let jetpack = class {
             this.pos
         );
         
-        // this.rotation += Math.PI / (((Math.random()) % 100) + 50);
+        //this.rotation += Math.PI / (((Math.random()) % 100) + 50);
 
         mat4.rotate(modelViewMatrix,
             modelViewMatrix,
@@ -201,23 +256,6 @@ let jetpack = class {
         mat4.invert(normalMatrix, modelViewMatrix);
         mat4.transpose(normalMatrix, normalMatrix);
 
-        {
-            const numComponents = 3;
-            const type = gl.FLOAT;
-            const normalize = false;
-            const stride = 0;
-            const offset = 0;
-            gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer.position);
-            gl.vertexAttribPointer(
-                programInfo.attribLocations.vertexPosition,
-                numComponents,
-                type,
-                normalize,
-                stride,
-                offset);
-            gl.enableVertexAttribArray(
-                programInfo.attribLocations.vertexPosition);
-        }
 
         // Tell WebGL how to pull out the normals from
         // the normal buffer into the vertexNormal attribute.
@@ -237,6 +275,23 @@ let jetpack = class {
                 offset);
             gl.enableVertexAttribArray(
                 programInfo.attribLocations.vertexNormal);
+        }
+        {
+            const numComponents = 3;
+            const type = gl.FLOAT;
+            const normalize = false;
+            const stride = 0;
+            const offset = 0;
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer.position);
+            gl.vertexAttribPointer(
+                programInfo.attribLocations.vertexPosition,
+                numComponents,
+                type,
+                normalize,
+                stride,
+                offset);
+            gl.enableVertexAttribArray(
+                programInfo.attribLocations.vertexPosition);
         }
 
         // tell webgl how to pull out the texture coordinates from buffer

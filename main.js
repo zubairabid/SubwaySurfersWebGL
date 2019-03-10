@@ -260,6 +260,7 @@ function main() {
 
   // Draw the scene repeatedly
   function render(now) {
+    document.getElementById("score").innerHTML = score;
     now *= 0.001;  // convert to seconds
     const deltaTime = now - then;
     then = now;
@@ -471,7 +472,8 @@ function main() {
 
 
 function init() {
-  player = new player(gl, [0.0, -1.0+boffset, -8.0], 0)
+  player = new player(gl, [0.0, -1.0+boffset, -8.0], 0);
+  police = new police(gl, [0.0, -1.0+boffset, -7.0], 0.01);
   for (let i = 0; i < renderlen; i++) {
     trk[i] = new track(gl, [0.0, -1.7+boffset, -2*i], speed_z);
     side[i] = new sidewall(gl, [-3.0, 0.3+boffset, -2*i], speed_z);
@@ -545,6 +547,8 @@ function drawScene(gl, programInfo, deltaTime) {
   // side.drawCube(gl, projectionMatrix, programInfo, deltaTime);
 
   player.drawCube(gl, projectionMatrix, programInfo, deltaTime);
+  police.drawCube(gl, projectionMatrix, programInfo, deltaTime);
+  
   for (let i = 0; i < renderlen; i++) {
     trk[i].drawCube(gl, projectionMatrix, programInfo, deltaTime);
     side[i].drawCube(gl, projectionMatrix, programInfo, deltaTime);
@@ -1059,8 +1063,9 @@ function checkcollision() {
       else {
         timeoutDeath = 1000;
         grey = true;
+        police.pos[2] = -7.0;
       }
-      console.log("Fence collision");
+      console.log("Fence collision");  
     }
   }
 
