@@ -549,7 +549,7 @@ function drawScene(gl, programInfo, deltaTime) {
     trk[i].drawCube(gl, projectionMatrix, programInfo, deltaTime);
     side[i].drawCube(gl, projectionMatrix, programInfo, deltaTime);
   }
-  stattrain.drawCube(gl, projectionMatrix, programInfo, deltaTime);
+  // stattrain.drawCube(gl, projectionMatrix, programInfo, deltaTime);
 
   if (!strn_fin) {
     for (let i = 0; i < trackstattrain; i++) {
@@ -1054,10 +1054,10 @@ function checkcollision() {
     if (detect_collision(fence[i], player)) {
       fence[i].pos = [1000, 1000, 1000];
       if (timeoutDeath > 0) {
-        console.log("dead");
+        window.alert("dead");
       }
       else {
-        timeoutDeath = 100;
+        timeoutDeath = 1000;
         grey = true;
       }
       console.log("Fence collision");
