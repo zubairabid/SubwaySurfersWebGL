@@ -50,7 +50,7 @@ let train = class {
         
 
         // The code for textures is similar to colours, but replacing
-        this.texture = loadTexture(gl, 'train2.jpg');
+        this.texture = loadTexture(gl, 'train3.jpg');
         console.log("Got texture loaded:", this.texture);
 
         const textureCoordinates = [

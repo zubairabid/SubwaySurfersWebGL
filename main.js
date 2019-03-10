@@ -9,6 +9,8 @@ main();
 var c;
 var c1;
 
+flash = false;
+flashtrack = 0;
 
 function main() {
   
@@ -57,18 +59,47 @@ function main() {
 
   // Vertex shader program
 
-  const vsSource = `
-    attribute vec4 aVertexPosition;
-    attribute vec4 aVertexColor;
+  // const vsSource = `
+  //   attribute vec4 aVertexPosition;
+  //   attribute vec4 aVertexColor;
 
+  //   uniform mat4 uModelViewMatrix;
+  //   uniform mat4 uProjectionMatrix;
+
+  //   varying lowp vec4 vColor;
+
+  //   void main(void) {
+  //     gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+  //     vColor = aVertexColor;
+  //   }
+  // `;
+
+  const vsSourceAlt = `
+    attribute vec4 aVertexPosition;
+    attribute vec3 aVertexNormal;
+    attribute vec2 aTextureCoord;
+
+    uniform mat4 uNormalMatrix;
     uniform mat4 uModelViewMatrix;
     uniform mat4 uProjectionMatrix;
 
-    varying lowp vec4 vColor;
+    varying highp vec2 vTextureCoord;
+    varying highp vec3 vLighting;
 
     void main(void) {
       gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
-      vColor = aVertexColor;
+      vTextureCoord = aTextureCoord;
+
+      // Apply lighting effect
+
+      highp vec3 ambientLight = vec3(0.3, 0.3, 0.3);
+      highp vec3 directionalLightColor = vec3(1, 1, 1);
+      highp vec3 directionalVector = normalize(vec3(-0.85, -0.8, 0.75));
+
+      highp vec4 transformedNormal = uNormalMatrix * vec4(aVertexNormal, 1.0);
+
+      highp float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
+      vLighting = ambientLight + (directionalLightColor * directional);
     }
   `;
 
@@ -103,14 +134,15 @@ function main() {
 
   // Fragment shader program
 
-  const fsSource = `
-    varying lowp vec4 vColor;
+  // const fsSource = `
+  //   varying lowp vec4 vColor;
 
-    void main(void) {
-      gl_FragColor = vColor;
-    }
-  `;
+  //   void main(void) {
+  //     gl_FragColor = vColor;
+  //   }
+  // `;
 
+ 
   const fsSourceText = `
     varying highp vec2 vTextureCoord;
     varying highp vec3 vLighting;
@@ -126,37 +158,31 @@ function main() {
 
   // Initialize a shader program; this is where all the lighting
   // for the vertices and so forth is established.
-  const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
+  // const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
   const shaderProgramText = initShaderProgram(gl, vsSourceText, fsSourceText);
+  const shaderProgramAlt = initShaderProgram(gl, vsSourceAlt, fsSourceText);
 
   // Collect all the info needed to use the shader program.
   // Look up which attributes our shader program is using
   // for aVertexPosition, aVevrtexColor and also
   // look up uniform locations.
-  const programInfo = {
-    program: shaderProgram,
+
+  
+  const programInfoAlt = {
+    program: shaderProgramAlt,
     attribLocations: {
-      vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
-      vertexColor: gl.getAttribLocation(shaderProgram, 'aVertexColor'),
+      vertexPosition: gl.getAttribLocation(shaderProgramAlt, 'aVertexPosition'),
+      vertexNormal: gl.getAttribLocation(shaderProgramAlt, 'aVertexNormal'),
+      textureCoord: gl.getAttribLocation(shaderProgramAlt, 'aTextureCoord'),
     },
     uniformLocations: {
-      projectionMatrix: gl.getUniformLocation(shaderProgram, 'uProjectionMatrix'),
-      modelViewMatrix: gl.getUniformLocation(shaderProgram, 'uModelViewMatrix'),
+      projectionMatrix: gl.getUniformLocation(shaderProgramAlt, 'uProjectionMatrix'),
+      modelViewMatrix: gl.getUniformLocation(shaderProgramAlt, 'uModelViewMatrix'),
+      normalMatrix: gl.getUniformLocation(shaderProgramAlt, 'uNormalMatrix'),
+      uSampler: gl.getUniformLocation(shaderProgramAlt, 'uSampler'),
     },
   };
 
-  // const programInfoText = {
-  //   program: shaderProgramText,
-  //   attribLocations: {
-  //     vertexPosition: gl.getAttribLocation(shaderProgramText, 'aVertexPosition'),
-  //     textureCoord: gl.getAttribLocation(shaderProgramText, 'aTextureCoord'),
-  //   },
-  //   uniformLocations: {
-  //     projectionMatrix: gl.getUniformLocation(shaderProgramText, 'uProjectionMatrix'),
-  //     modelViewMatrix: gl.getUniformLocation(shaderProgramText, 'uModelViewMatrix'),
-  //     uSampler: gl.getUniformLocation(shaderProgramText, 'uSampler'),
-  //   },
-  // };
 
   const programInfoText = {
     program: shaderProgramText,
@@ -290,7 +316,26 @@ function main() {
     
 
 
-    drawScene(gl, programInfoText, deltaTime);
+    // temp = programInfoText;
+    // console.log(flash);
+    // if (flash == true) {
+    //   drawScene(gl, programInfoAlt, deltaTime);
+    // }
+    // else {
+    //   drawScene(gl, programInfoText, deltaTime);
+    // }
+
+    temp = programInfoText;
+    console.log(flash);
+    if (flash === true) {
+      if (flashtrack % 2 === 0) {
+        temp = programInfoAlt;
+      }
+      else {
+        temp = programInfoText;
+      }
+    }
+    drawScene(gl, temp, deltaTime);
 
     requestAnimationFrame(render);
   }
@@ -501,6 +546,20 @@ document.addEventListener('keyup', function (event) {
       if (player.pos[1] == -2.0) {
         player.speed_y = 0.2;
       }
+  }
+  if (key === 'KeyA' || key === 'a' || key === 65 || key === 97) {
+      console.log("*****\n******\n*******\n*******\nA was hit\n*****\n******\n*******\n*******");
+      // if (player.pos[1] == -2.0) {
+      //   player.speed_y = 0.2;
+      // }
+      flash = true;
+  }
+  if (key === 'KeyB' || key === 'b' || key === 66 || key === 98) {
+      console.log("B was hit");
+      // if (player.pos[1] == -2.0) {
+      //   player.speed_y = 0.2;
+      // }
+      flash = false;
   }
 
 });
