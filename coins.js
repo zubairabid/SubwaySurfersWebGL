@@ -5,6 +5,10 @@ let coin = class {
         this.positionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
 
+        this.width = 0.2;
+        this.height = 0.2;
+        this.length = 0.1;
+
         this.positions = [
              // Front face
             -0.2, -0.2, 0.1,

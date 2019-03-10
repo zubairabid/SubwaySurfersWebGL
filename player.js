@@ -5,6 +5,10 @@ let player = class {
         this.positionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
 
+        this.width = 0.3;
+        this.height = 0.7;
+        this.length = 0.3;
+
         this.positions = [
              // Front face
             -0.3, -0.7, 0.3,

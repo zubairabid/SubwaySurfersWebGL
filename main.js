@@ -9,11 +9,19 @@ main();
 var c;
 var c1;
 
+
+timeoutJump = -1;
+timeoutFly = -1;
+
+
+
 flash = false;
 flashtrack = 0;
 grey = false;
 highjump = false;
 height = 0;
+
+score = 0;
 
 function main() {
   
@@ -256,6 +264,25 @@ function main() {
     then = now;
 
     dist += speed_z;
+
+
+
+
+    timeoutFly -= 1;
+    timeoutJump -= 1;
+
+    if (timeoutFly === 0) {
+      ajetpack();
+    }
+    if (timeoutJump === 0) {
+      highjump = false;
+    }
+
+
+
+
+
+
     // console.log(dist);
     if (dist >= 2) {
       // Create floor
@@ -399,6 +426,8 @@ function main() {
         jet_fin = true;
       }
     }
+
+    checkcollision();
 
     
     
@@ -727,6 +756,16 @@ document.addEventListener('keyup', function (event) {
 
 });
 
+
+function detect_collision(a, b) {
+	return (Math.abs(a.pos[0] - b.pos[0]) < (a.width + b.width)) &&
+           (Math.abs(a.pos[1] - b.pos[1]) < (a.height + b.height)) &&
+           (Math.abs(a.pos[2] - b.pos[2]) < (a.length + b.length));
+}
+
+
+
+
 function ajetpack() {
 
   if (speed_z == 1) {
@@ -920,6 +959,54 @@ function ajetpack() {
       }
     }
   }
+}
+
+function checkcollision() {
+  // player and coin
+  a = coinlen;
+  if (!coin_fin) {
+    a = trackcoins;
+  }
+  for (let i = 0; i < a; i+= 1) {
+    if (detect_collision(coins[i], player)) {
+      console.log("Collided coin");
+      coins[i].pos = [1000, 1000, 1000];
+      score += 1;
+    }
+  }
+
+
+  // Player and boot
+  a = powerlen
+  if (!jump_fin) {
+    a = trackjump;
+  }
+  for (let i= 0; i < a; i+= 1) {
+    if (detect_collision(boots[i], player)) {
+      timeoutJump = 500;
+      console.log("Collided boot");
+      boots[i].pos = [1000, 1000, 1000];
+      highjump = true;
+    }
+  }
+
+  // Player and jetpack
+  a = powerlen
+  if (!jet_fin) {
+    a = trackjet;
+  }
+  for (let i= 0; i < a; i+= 1) {
+    if (detect_collision(jets[i], player)) {
+      timeoutFly = 200;
+      console.log("Collided jet");
+      jets[i].pos = [1000, 1000, 1000];
+      ajetpack();
+    }
+    // highjump = true;
+  }
+
+
+
 }
 
 // }

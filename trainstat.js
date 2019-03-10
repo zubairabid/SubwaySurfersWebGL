@@ -5,6 +5,11 @@ let trainstat = class {
         this.positionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
 
+
+        this.width = 1.0;
+        this.height = 1.0;
+        this.length = 1.0;
+
         this.positions = [
              // Front face
             -1.0, -1.0, 1.0,

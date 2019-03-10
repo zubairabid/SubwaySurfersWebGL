@@ -5,6 +5,10 @@ let fences = class {
         this.positionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
 
+        this.width = 0.5;
+        this.height = 0.5;
+        this.length = 0.1;
+
         this.positions = [
              // Front face
             -0.5, -0.5, 0.1,

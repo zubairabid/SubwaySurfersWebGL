@@ -5,6 +5,10 @@ let boot = class {
         this.positionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
 
+        this.width = 0.4;
+        this.height = 0.4;
+        this.length = 0.1;
+
         this.positions = [
              // Front face
             -0.4, -0.4, 0.1,
