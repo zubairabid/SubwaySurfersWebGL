@@ -11,6 +11,7 @@ var c1;
 
 flash = false;
 flashtrack = 0;
+grey = false;
 
 function main() {
   
@@ -156,11 +157,27 @@ function main() {
     }
   `;
 
+  const fsSourceTextGS = `
+    varying highp vec2 vTextureCoord;
+    varying highp vec3 vLighting;
+
+    uniform sampler2D uSampler;
+
+    void main(void) {
+      precision highp float;
+      
+      highp vec4 color = texture2D(uSampler, vTextureCoord);
+      float grey = dot(color.rgb, vec3(0.4, 0.1, 0.3));
+      gl_FragColor = vec4(vec3(grey), 1.0);
+    }
+  `;
+
   // Initialize a shader program; this is where all the lighting
   // for the vertices and so forth is established.
   // const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
   const shaderProgramText = initShaderProgram(gl, vsSourceText, fsSourceText);
   const shaderProgramAlt = initShaderProgram(gl, vsSourceAlt, fsSourceText);
+  const shaderProgramGS = initShaderProgram(gl, vsSourceText, fsSourceTextGS);
 
   // Collect all the info needed to use the shader program.
   // Look up which attributes our shader program is using
@@ -196,6 +213,21 @@ function main() {
       modelViewMatrix: gl.getUniformLocation(shaderProgramText, 'uModelViewMatrix'),
       normalMatrix: gl.getUniformLocation(shaderProgramText, 'uNormalMatrix'),
       uSampler: gl.getUniformLocation(shaderProgramText, 'uSampler'),
+    },
+  };
+
+  const programInfoGS = {
+    program: shaderProgramGS,
+    attribLocations: {
+      vertexPosition: gl.getAttribLocation(shaderProgramGS, 'aVertexPosition'),
+      vertexNormal: gl.getAttribLocation(shaderProgramGS, 'aVertexNormal'),
+      textureCoord: gl.getAttribLocation(shaderProgramGS, 'aTextureCoord'),
+    },
+    uniformLocations: {
+      projectionMatrix: gl.getUniformLocation(shaderProgramGS, 'uProjectionMatrix'),
+      modelViewMatrix: gl.getUniformLocation(shaderProgramGS, 'uModelViewMatrix'),
+      normalMatrix: gl.getUniformLocation(shaderProgramGS, 'uNormalMatrix'),
+      uSampler: gl.getUniformLocation(shaderProgramGS, 'uSampler'),
     },
   };
 
@@ -326,14 +358,18 @@ function main() {
     // }
 
     temp = programInfoText;
-    console.log(flash);
+    console.log(grey);
     if (flash === true) {
-      if (flashtrack % 2 === 0) {
+      if (flashtrack % 20 >= 0 && flashtrack % 20 < 10) {
         temp = programInfoAlt;
       }
       else {
         temp = programInfoText;
       }
+      flashtrack += 1;
+    }
+    else if (grey === true) {
+      temp = programInfoGS;
     }
     drawScene(gl, temp, deltaTime);
 
@@ -560,6 +596,20 @@ document.addEventListener('keyup', function (event) {
       //   player.speed_y = 0.2;
       // }
       flash = false;
+  }
+  if (key === 'KeyC' || key === 'c' || key === 67 || key === 99) {
+      console.log("*****\n******\n*******\n*******\nC was hit\n*****\n******\n*******\n*******");
+      // if (player.pos[1] == -2.0) {
+      //   player.speed_y = 0.2;
+      // }
+      grey = true;
+  }
+  if (key === 'KeyD' || key === 'd' || key === 68 || key === 100) {
+      console.log("D was hit");
+      // if (player.pos[1] == -2.0) {
+      //   player.speed_y = 0.2;
+      // }
+      grey = false;
   }
 
 });
