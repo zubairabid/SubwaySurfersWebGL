@@ -24,21 +24,28 @@ function main() {
   speed_z = 0.08;
   dist = 0;
   renderlen = 40;
+  coinlen = 100;
+  coinprob = 0.06;
+  obslen = 20;
+  obsprob = 0.004;
+  powerlen = 5;
+  powerprob = 0.001;
+
   tracktrk = 0;
   trackside = 0;
   trackstattrain = 0;
   tracktrain = 0;
   trackfence = 0;
   trackcoins = 0;
-  coinlen = 100;
-  coinprob = 0.06;
-  obslen = 20;
-  obsprob = 0.004;
+  trackjump = 0;
+
+  
 
   strn_fin = false;
   trn_fin = false;
   fence_fin = false;
   coin_fin = false;
+  jump_fin = false;
 
   trk = [];
   side = [];
@@ -47,6 +54,7 @@ function main() {
   stattrain = [];
   strain = [];
   fence = [];
+  boots = [];
   
 
   init();
@@ -345,6 +353,29 @@ function main() {
         coin_fin = true;
       }
     }
+
+    // Create boots 
+    if (Math.random() < powerprob) {
+
+      // Moving train
+      pos = 0.0;
+      if (Math.random() < 0.33) {
+        pos = 1.7;
+      }
+      else if (Math.random() < 0.66) {
+        pos = -1.7;
+      }
+
+
+      boots[trackjump] = new boot(gl, [pos, -2, -(renderlen-1)*2], speed_z);
+      trackjump += 1;
+      if (trackjump >= powerlen) {
+        trackjump = 0;
+        jump_fin = true;
+      }
+    }
+
+    
     
 
 
@@ -502,6 +533,18 @@ function drawScene(gl, programInfo, deltaTime) {
   else {
     for (let i = 0; i < obslen; i++) {
       coins[i].drawCube(gl, projectionMatrix, programInfo, deltaTime);
+    }
+  }
+
+  
+  if (!jump_fin) {
+    for (let i = 0; i < trackjump; i++) {
+      boots[i].drawCube(gl, projectionMatrix, programInfo, deltaTime);
+    }
+  }
+  else {
+    for (let i = 0; i < powerlen; i++) {
+      boots[i].drawCube(gl, projectionMatrix, programInfo, deltaTime);
     }
   }
 
