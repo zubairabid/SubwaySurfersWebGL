@@ -172,6 +172,7 @@ let fences = class {
     move() {
         // console.log(this.speed_x);
         this.pos[2] += this.speed_z;
+        this.pos[1] += this.speed_y;
     }
 
     drawCube(gl, projectionMatrix, programInfo, deltaTime) {

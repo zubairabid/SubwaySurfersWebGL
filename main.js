@@ -12,6 +12,8 @@ var c1;
 flash = false;
 flashtrack = 0;
 grey = false;
+highjump = false;
+height = 0;
 
 function main() {
   
@@ -265,8 +267,8 @@ function main() {
         tracktrk = 0;
       }
   
-      trk[tracktrk] = new track(gl, [0.0, -1.7+boffset, -(renderlen-1)*2], speed_z);
-      side[trackside] = new sidewall(gl, [-3.0, 0.3+boffset, -(renderlen-1)*2], speed_z);
+      trk[tracktrk] = new track(gl, [0.0, -1.7+boffset+height, -(renderlen-1)*2], speed_z);
+      side[trackside] = new sidewall(gl, [-3.0, 0.3+boffset+height, -(renderlen-1)*2], speed_z);
       
       dist = 0;
     }
@@ -284,7 +286,7 @@ function main() {
         pos = -1.7;
       }
 
-      stattrain[trackstattrain] = new trainstat(gl, [pos, -1.7, -(renderlen-1)*2], speed_z);
+      stattrain[trackstattrain] = new trainstat(gl, [pos, -1.7+height, -(renderlen-1)*2], speed_z);
       trackstattrain += 1;
       if (trackstattrain >= obslen) {
         trackstattrain = 0;
@@ -304,7 +306,7 @@ function main() {
         pos = -1.7;
       }
 
-      strain[tracktrain] = new train(gl, [pos, -1.7, -(renderlen-1)*2], 4*speed_z);
+      strain[tracktrain] = new train(gl, [pos, -1.7+height, -(renderlen-1)*2], 4*speed_z);
       tracktrain += 1;
       if (tracktrain >= obslen) {
         tracktrain = 0;
@@ -325,7 +327,7 @@ function main() {
       }
 
 
-      fence[trackfence] = new fences(gl, [pos, -2.2, -(renderlen-1)*2], speed_z);
+      fence[trackfence] = new fences(gl, [pos, -2.2+height, -(renderlen-1)*2], speed_z);
       trackfence += 1;
       if (trackfence >= obslen) {
         trackfence = 0;
@@ -346,7 +348,7 @@ function main() {
       }
 
 
-      coins[trackcoins] = new coin(gl, [pos, -2, -(renderlen-1)*2], speed_z);
+      coins[trackcoins] = new coin(gl, [pos, -2+height, -(renderlen-1)*2], speed_z);
       trackcoins += 1;
       if (trackcoins >= coinlen) {
         trackcoins = 0;
@@ -367,7 +369,7 @@ function main() {
       }
 
 
-      boots[trackjump] = new boot(gl, [pos, -2, -(renderlen-1)*2], speed_z);
+      boots[trackjump] = new boot(gl, [pos, -2+height, -(renderlen-1)*2], speed_z);
       trackjump += 1;
       if (trackjump >= powerlen) {
         trackjump = 0;
@@ -612,18 +614,34 @@ document.addEventListener('keyup', function (event) {
 
   if (key === 'ArrowRight' || key === 39) {
       console.log("right was hit");
-      player.speed_x = 0.5;
+      player.speed_x = 0.125;
       // this.move();
   }
   if (key === 'ArrowLeft' || key === 37) {
       console.log("left was hit");
-      player.speed_x = -0.5;
+      player.speed_x = -0.125;
       // this.move();
   }
   if (key === 'ArrowUp' || key === 38) {
       console.log("up was hit");
+      // player.speed_x = -0.5;
+      if (highjump) {
+        highjump = false;
+      }
+      else {
+        highjump = true;
+      }
+      // this.move();
+  }
+  if ((key === 'Space' || key === ' ' || key === 32) && speed_z != 1) {
+      console.log("space was hit");
       if (player.pos[1] == -2.0) {
-        player.speed_y = 0.2;
+        if (highjump) {
+          player.speed_y = 0.3;
+        }
+        else {
+          player.speed_y = 0.22;
+        }
       }
   }
   if (key === 'KeyA' || key === 'a' || key === 65 || key === 97) {
@@ -648,11 +666,271 @@ document.addEventListener('keyup', function (event) {
       grey = true;
   }
   if (key === 'KeyD' || key === 'd' || key === 68 || key === 100) {
-      console.log("D was hit");
-      // if (player.pos[1] == -2.0) {
-      //   player.speed_y = 0.2;
-      // }
-      grey = false;
+    console.log("D was hit");
+    // if (player.pos[1] == -2.0) {
+    //   player.speed_y = 0.2;
+    // }
+    grey = false;
+  }
+  if (key === 'KeyE' || key === 'e' || key === 69 || key === 101) {
+    console.log("D was hit");
+    // if (player.pos[1] == -2.0) {
+    //   player.speed_y = 0.2;
+    // }
+    // grey = false;
+    jetpack();
+  }
+  if (key === 'KeyF' || key === 'f' || key === 70 || key === 102) {
+    console.log("D was hit");
+    // if (player.pos[1] == -2.0) {
+    //   player.speed_y = 0.2;
+    // }
+    // grey = false;
+    // rjetpack();
   }
 
+
 });
+
+function jetpack() {
+
+  if (speed_z == 1) {
+    speed_z = 0.08;
+    height += 4;
+
+
+
+    for (let i = 0; i < renderlen; i++) {
+      trk[i].pos[1]+= 4;
+      trk[i].speed_z = speed_z;
+      
+      side[i].pos[1]+= 4;
+      side[i].speed_z = speed_z;
+    }
+    stattrain.pos[1]+= 4;
+
+    if (!strn_fin) {
+      for (let i = 0; i < trackstattrain; i++) {
+        stattrain[i].pos[1]+= 4;
+        stattrain[i].speed_z = speed_z;
+      }
+    }
+    else {
+      for (let i = 0; i < obslen; i++) {
+        stattrain[i].pos[1]+= 4;
+        stattrain[i].speed_z = speed_z;
+      }
+    }
+
+    if (!trn_fin) {
+      for (let i = 0; i < tracktrain; i++) {
+        strain[i].pos[1]+= 4;
+        strain[i].speed_z = speed_z;
+      }
+    }
+    else {
+      for (let i = 0; i < obslen; i++) {
+        strain[i].pos[1]+= 4;
+        strain[i].speed_z = speed_z;
+      }
+    }
+
+    if (!fence_fin) {
+      for (let i = 0; i < trackfence; i++) {
+        fence[i].pos[1]+= 4;
+        fence[i].speed_z = speed_z;
+      }
+    }
+    else {
+      for (let i = 0; i < obslen; i++) {
+        fence[i].pos[1]+= 4;
+        fence[i].speed_z = speed_z;
+      }
+    }
+
+    if (!coin_fin) {
+      for (let i = 0; i < trackcoins; i++) {
+        coins[i].pos[1]+= 4;
+        coins[i].speed_z = speed_z;
+      }
+    }
+    else {
+      for (let i = 0; i < obslen; i++) {
+        coins[i].pos[1]+= 4;
+        coins[i].speed_z = speed_z;
+      }
+    }
+
+    
+    if (!jump_fin) {
+      for (let i = 0; i < trackjump; i++) {
+        boots[i].pos[1]+= 4;
+        boots[i].speed_z = speed_z;
+      }
+    }
+    else {
+      for (let i = 0; i < powerlen; i++) {
+        boots[i].pos[1]+= 4;
+        boots[i].speed_z = speed_z;
+      }
+    }
+
+
+
+
+  }
+  else {
+    speed_z = 1;
+
+    height -= 4;
+
+    for (let i = 0; i < renderlen; i++) {
+      trk[i].pos[1]-= 4;
+      trk[i].speed_z = speed_z;
+      
+      side[i].pos[1]-= 4;
+      side[i].speed_z = speed_z;
+    }
+    stattrain.pos[1]-= 4;
+
+    if (!strn_fin) {
+      for (let i = 0; i < trackstattrain; i++) {
+        stattrain[i].pos[1]-= 4;
+        stattrain[i].speed_z = speed_z;
+      }
+    }
+    else {
+      for (let i = 0; i < obslen; i++) {
+        stattrain[i].pos[1]-= 4;
+        stattrain[i].speed_z = speed_z;
+      }
+    }
+
+    if (!trn_fin) {
+      for (let i = 0; i < tracktrain; i++) {
+        strain[i].pos[1]-= 4;
+        strain[i].speed_z = speed_z;
+      }
+    }
+    else {
+      for (let i = 0; i < obslen; i++) {
+        strain[i].pos[1]-= 4;
+        strain[i].speed_z = speed_z;
+      }
+    }
+
+    if (!fence_fin) {
+      for (let i = 0; i < trackfence; i++) {
+        fence[i].pos[1]-= 4;
+        fence[i].speed_z = speed_z;
+      }
+    }
+    else {
+      for (let i = 0; i < obslen; i++) {
+        fence[i].pos[1]-= 4;
+        fence[i].speed_z = speed_z;
+      }
+    }
+
+    if (!coin_fin) {
+      for (let i = 0; i < trackcoins; i++) {
+        coins[i].pos[1]-= 4;
+        coins[i].speed_z = speed_z;
+      }
+    }
+    else {
+      for (let i = 0; i < obslen; i++) {
+        coins[i].pos[1]-= 4;
+        coins[i].speed_z = speed_z;
+      }
+    }
+
+    
+    if (!jump_fin) {
+      for (let i = 0; i < trackjump; i++) {
+        boots[i].pos[1]-= 4;
+        boots[i].speed_z = speed_z;
+      }
+    }
+    else {
+      for (let i = 0; i < powerlen; i++) {
+        boots[i].pos[1]-= 4;
+        boots[i].speed_z = speed_z;
+      }
+    }
+  }
+}
+
+// }
+
+// function rjetpack() {
+//   speed_z = 0.08;
+
+//   height += 4;
+
+//   for (let i = 0; i < renderlen; i++) {
+//     trk[i].speed_y = 0.01;
+//     trk[i].speed_z = 0.08;
+//     side[i].speed_y = 0.01;
+//     side[i].speed_z = 0.08;
+//   }
+//   stattrain.speed_y = 0.1;
+
+//   if (!strn_fin) {
+//     for (let i = 0; i < trackstattrain; i++) {
+//       stattrain[i].speed_y = 0.1;
+//     }
+//   }
+//   else {
+//     for (let i = 0; i < obslen; i++) {
+//       stattrain[i].speed_y = 0.1;
+//     }
+//   }
+
+//   if (!trn_fin) {
+//     for (let i = 0; i < tracktrain; i++) {
+//       strain[i].speed_y = 0.1;
+//     }
+//   }
+//   else {
+//     for (let i = 0; i < obslen; i++) {
+//       strain[i].speed_y = 0.1;
+//     }
+//   }
+
+//   if (!fence_fin) {
+//     for (let i = 0; i < trackfence; i++) {
+//       fence[i].speed_y = 0.1;
+//     }
+//   }
+//   else {
+//     for (let i = 0; i < obslen; i++) {
+//       fence[i].speed_y = 0.1;
+//     }
+//   }
+
+//   if (!coin_fin) {
+//     for (let i = 0; i < trackcoins; i++) {
+//       coins[i].speed_y = 0.1;
+//     }
+//   }
+//   else {
+//     for (let i = 0; i < obslen; i++) {
+//       coins[i].speed_y = 0.1;
+//     }
+//   }
+
+  
+//   if (!jump_fin) {
+//     for (let i = 0; i < trackjump; i++) {
+//       boots[i].speed_y = 0.1;
+//     }
+//   }
+//   else {
+//     for (let i = 0; i < powerlen; i++) {
+//       boots[i].speed_y = 0.1;
+//     }
+//   }
+
+
+// }

@@ -201,11 +201,12 @@ let player = class {
             // console.log("Should move");
             this.pos[0] += this.speed_x;
 
-            if (this.pos[0] > 2.4 || this.pos[0] < -2.4) {
+            if (this.pos[0] > 2.1 || this.pos[0] < -2.1) {
                 this.pos[0] -= this.speed_x;
             }
+            // console.log(this.pos[0]);
 
-            if (this.pos[0] == 0 || this.pos[0] == -2.4 || this.pos[0] == 2.4) {
+            if (this.pos[0] == 0 || this.pos[0] == -2.1 || this.pos[0] == 2.1) {
                 this.speed_x = 0;
             }
         }

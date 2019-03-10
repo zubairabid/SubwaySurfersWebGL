@@ -21,6 +21,7 @@ let sidewall = class {
         this.rotation = 0;
 
         this.pos = pos;
+        this.speed_y = 0;
         this.speed_z = speed_z;
 
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.positions), gl.STATIC_DRAW);
@@ -101,6 +102,7 @@ let sidewall = class {
 
     move() {
         this.pos[2] += this.speed_z;
+        this.pos[1] += this.speed_y;
     }
 
     drawCube(gl, projectionMatrix, programInfo, deltaTime) {
