@@ -8,7 +8,7 @@ let jetpack = class {
         this.width = 0.4;
         this.height = 0.4;
         this.length = 0.1;
-        
+
         this.positions = [
              // Front face
             -0.4, -0.4, 0.1,
@@ -55,7 +55,7 @@ let jetpack = class {
 
         // The code for textures is similar to colours, but replacing
         this.texture = loadTexture(gl, 'jet.jpg');
-        console.log("Got texture loaded:", this.texture);
+        // console.log("Got texture loaded:", this.texture);
 
         const textureCoordinates = [
              // Front

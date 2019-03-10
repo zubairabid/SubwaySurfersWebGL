@@ -12,6 +12,7 @@ var c1;
 
 timeoutJump = -1;
 timeoutFly = -1;
+timeoutDeath = -1;
 
 
 
@@ -270,12 +271,16 @@ function main() {
 
     timeoutFly -= 1;
     timeoutJump -= 1;
+    timeoutDeath -= 1;
 
     if (timeoutFly === 0) {
       ajetpack();
     }
     if (timeoutJump === 0) {
       highjump = false;
+    }
+    if (timeoutDeath == 0) {
+      grey = false;
     }
 
 
@@ -443,7 +448,7 @@ function main() {
     // }
 
     temp = programInfoText;
-    console.log(grey);
+    // console.log(grey);
     if (flash === true) {
       if (flashtrack % 20 >= 0 && flashtrack % 20 < 10) {
         temp = programInfoAlt;
@@ -1005,6 +1010,59 @@ function checkcollision() {
     // highjump = true;
   }
 
+  
+  // Player and trainstat
+  a = obslen
+  if (!strn_fin) {
+    a = trackstattrain;
+  }
+  for (let i = 0; i < a; i+=1) {
+    if (detect_collision(stattrain[i], player)) {
+      if (player.pos[1] > stattrain[i].pos[1]+stattrain[1].height) {
+        console.log("top of train");
+      }
+      else {
+        window.alert("dead");
+      }
+      console.log("Static train collision");
+    }
+  }
+
+  // Player and train
+  a = obslen
+  if (!trn_fin) {
+    a = tracktrain;
+  }
+  for (let i = 0; i < a; i+=1) {
+    if (detect_collision(strain[i], player)) {
+      if (player.pos[1] > strain[i].pos[1]+strain[1].height) {
+        console.log("top of train");
+      }
+      else {
+        window.alert("dead");
+      }
+      console.log("train collision");
+    }
+  }
+
+  // Player and fence
+  a = obslen
+  if (!fence_fin) {
+    a = trackfence;
+  }
+  for (let i = 0; i < a; i++) {
+    if (detect_collision(fence[i], player)) {
+      fence[i].pos = [1000, 1000, 1000];
+      if (timeoutDeath > 0) {
+        console.log("dead");
+      }
+      else {
+        timeoutDeath = 100;
+        grey = true;
+      }
+      console.log("Fence collision");
+    }
+  }
 
 
 }

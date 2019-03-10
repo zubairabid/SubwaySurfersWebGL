@@ -56,7 +56,7 @@ let trainstat = class {
 
         // The code for textures is similar to colours, but replacing
         this.texture = loadTexture(gl, 'trainfront.jpg');
-        console.log("Got texture loaded:", this.texture);
+        // console.log("Got texture loaded:", this.texture);
 
         const textureCoordinates = [
              // Front

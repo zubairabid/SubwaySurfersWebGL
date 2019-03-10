@@ -55,7 +55,7 @@ let player = class {
 
         // The code for textures is similar to colours, but replacing
         this.texture = loadTexture(gl, 'steve.jpeg');
-        console.log("Got texture loaded:", this.texture);
+        // console.log("Got texture loaded:", this.texture);
 
         const textureCoordinates = [
              // Front
@@ -226,7 +226,7 @@ let player = class {
 
         if (this.speed_y != 0) {
             this.pos[1] += this.speed_y;
-            console.log("In loop: ", this.pos[1]);
+            // console.log("In loop: ", this.pos[1]);
             this.speed_y -= 0.01;
             if (this.pos[1] <= -2.0) {
                 this.speed_y = 0;
