@@ -40,6 +40,7 @@ function main() {
   trackfence = 0;
   trackcoins = 0;
   trackjump = 0;
+  trackjet = 0;
 
   
 
@@ -48,6 +49,7 @@ function main() {
   fence_fin = false;
   coin_fin = false;
   jump_fin = false;
+  jet_fin = false;
 
   trk = [];
   side = [];
@@ -57,7 +59,7 @@ function main() {
   strain = [];
   fence = [];
   boots = [];
-  
+  jets = [];
 
   init();
 
@@ -377,6 +379,27 @@ function main() {
       }
     }
 
+    // Create jets 
+    if (Math.random() < powerprob) {
+
+      // Moving train
+      pos = 0.0;
+      if (Math.random() < 0.33) {
+        pos = 1.7;
+      }
+      else if (Math.random() < 0.66) {
+        pos = -1.7;
+      }
+
+
+      jets[trackjet] = new jetpack(gl, [pos, -2+height, -(renderlen-1)*2], speed_z);
+      trackjet += 1;
+      if (trackjet >= powerlen) {
+        trackjet = 0;
+        jet_fin = true;
+      }
+    }
+
     
     
 
@@ -551,6 +574,18 @@ function drawScene(gl, programInfo, deltaTime) {
   }
 
   
+  if (!jet_fin) {
+    for (let i = 0; i < trackjet; i++) {
+      jets[i].drawCube(gl, projectionMatrix, programInfo, deltaTime);
+    }
+  }
+  else {
+    for (let i = 0; i < powerlen; i++) {
+      jets[i].drawCube(gl, projectionMatrix, programInfo, deltaTime);
+    }
+  }
+
+  
 
   
 
@@ -678,7 +713,7 @@ document.addEventListener('keyup', function (event) {
     //   player.speed_y = 0.2;
     // }
     // grey = false;
-    jetpack();
+    ajetpack();
   }
   if (key === 'KeyF' || key === 'f' || key === 70 || key === 102) {
     console.log("D was hit");
@@ -692,7 +727,7 @@ document.addEventListener('keyup', function (event) {
 
 });
 
-function jetpack() {
+function ajetpack() {
 
   if (speed_z == 1) {
     speed_z = 0.08;
@@ -775,6 +810,19 @@ function jetpack() {
       }
     }
 
+  
+    if (!jet_fin) {
+      for (let i = 0; i < trackjet; i++) {
+        jets[i].pos[1] += 4;
+        jets[i].speed_z = speed_z;
+      }
+    }
+    else {
+      for (let i = 0; i < powerlen; i++) {
+        jets[i].pos[1] += 4;
+        jets[i].speed_z = speed_z;
+      }
+    }
 
 
 
@@ -856,6 +904,19 @@ function jetpack() {
       for (let i = 0; i < powerlen; i++) {
         boots[i].pos[1]-= 4;
         boots[i].speed_z = speed_z;
+      }
+    }
+  
+    if (!jet_fin) {
+      for (let i = 0; i < trackjet; i++) {
+        jets[i].pos[1] -= 4;
+        jets[i].speed_z = speed_z;
+      }
+    }
+    else {
+      for (let i = 0; i < powerlen; i++) {
+        jets[i].pos[1] -= 4;
+        jets[i].speed_z = speed_z;
       }
     }
   }
